@@ -4,6 +4,7 @@ package com.example.android.bakingapp;
  * Created by mina essam on 15-Jun-17.
  */
 
+import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -27,6 +28,24 @@ public class Recipe implements Parcelable{
     @JsonField(name="steps")
     private List<Step> steps=new ArrayList<>();
 
+    public static Intent getFakeIntent(){
+        Recipe recipe=new Recipe();
+        recipe.setName("nutella");
+        recipe.setImageUrl("");
+        List<Ingredient> ingredients=new ArrayList<>();
+        for(int i=0;i<5;++i){
+            Ingredient ingredient=new Ingredient();
+            ingredient.setIngredient("Tea");
+            ingredient.setMeasure("OZ");
+            ingredient.setQuantity(i);
+            ingredients.add(ingredient);
+        }
+        recipe.setIngredients(ingredients);
+        Intent intent=new Intent();
+        intent.putExtra("recipePosition",0);
+        intent.putExtra("recipe",recipe);
+        return intent;
+    }
     public Recipe() {
 
     }

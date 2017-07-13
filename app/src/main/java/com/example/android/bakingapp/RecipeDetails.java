@@ -17,7 +17,7 @@ public class RecipeDetails extends FragmentActivity implements RecipeDetailsAdap
         Bundle inputBundle=getIntent().getExtras();
         recipePosition=inputBundle.getInt("recipePosition");
         recipe=inputBundle.getParcelable("recipe");
-        Log.d("RecipeDetails","RecipeDetails = "+recipePosition);
+        Log.d("RecipeDetails","RecipeDetails =  "+recipePosition);
         RecipeDetailsFragment fragment=new RecipeDetailsFragment();
         Bundle bundle=new Bundle();
         bundle.putInt("recipePosition",recipePosition);
@@ -25,7 +25,7 @@ public class RecipeDetails extends FragmentActivity implements RecipeDetailsAdap
         if(recipe==null){
             Log.d("RecipeDetails","Recipe is Null");
         }else {
-            Log.d("RecipeDetails","Recipe size"+recipe.getIngredients().size());
+            Log.d("RecipeDetails"," Recipe size  "+recipe.getIngredients().size());
         }
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().add(R.id.recipe_details_fragment,fragment).commit();
@@ -55,17 +55,15 @@ public class RecipeDetails extends FragmentActivity implements RecipeDetailsAdap
                 intent.putExtra("isTwoPane", isTwoPane);
                 intent.putExtra("stepPosition", stepPosition-1);
                 intent.putExtra("recipePosition", recipePosition);
+                intent.putExtra("recipe",recipe);
+                Log.d("RecipeDetails"," Recipe size  "+recipe.getIngredients().size());
                 startActivity(intent);
 
             } else {
                 Intent intent=new Intent(this,IngredientDetails.class);
                 intent.putExtra("recipePosition", recipePosition);
                 intent.putExtra("recipe",recipe);
-                    if(recipe==null){
-                        Log.d("RecipeDetails","Recipe is Null");
-                    }else if(recipe.getIngredients()==null){
-                        Log.d("RecipeDetails","ingredients is Null");
-                    }
+                Log.d("RecipeDetails"," Recipe size to ingredients  "+recipe.getIngredients().size());
                 startActivity(intent);
             }
         }else{

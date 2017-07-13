@@ -25,6 +25,7 @@ public class RecipeDetailsFragment extends Fragment  {
     RecipeDetailsAdapter adapter;
     RecipeDetailsAdapter.ViewClickListener listener;
     private int recipePosition;
+    Recipe recipe;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -34,9 +35,11 @@ public class RecipeDetailsFragment extends Fragment  {
         Bundle bundle=getArguments();
         recipePosition=bundle.getInt("recipePosition");
         Log.d("StepDetailsFragment"," position  "+recipePosition);
+        recipe=bundle.getParcelable("recipe");
+        Log.d("RecipeDetailsFragment"," Recipe size  "+recipe.getIngredients().size());
         //add the adapter for this fragment
         //pass the position to get the exact recipe
-        adapter=new RecipeDetailsAdapter(getContext(),recipePosition);
+        adapter=new RecipeDetailsAdapter(getContext(),recipePosition,recipe);
         adapter.setListener(listener);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

@@ -2,12 +2,11 @@ package com.example.android.bakingapp;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.example.android.bakingapp.SharedData.SharedRecipes;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,6 +19,7 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
     private Context context;
     private int index;
     private ViewClickListener listener;
+    private Recipe recipe;
 
     public void setListener(ViewClickListener listener) {
         this.listener = listener;
@@ -29,9 +29,10 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
         void onViewClickListener(int stepPosition);
     }
 
-    public RecipeDetailsAdapter (Context context,int index){
+    public RecipeDetailsAdapter (Context context,int index,Recipe recipe){
         this.context=context;
         this.index=index;
+        this.recipe=recipe;
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -49,8 +50,9 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
             holder.textView.setText("Ingredients");
             holder.textView.setBackgroundColor(context.getResources().getColor(R.color.lightGreen));
         }else {
-            holder.textView.setText(""+position+" - "+SharedRecipes.sharedRecipes.get(index).getSteps().get(position-1).getShortDes());
+            holder.textView.setText(""+position+" - "+recipe.getSteps().get(position-1).getShortDes());
             holder.textView.setBackgroundColor(context.getResources().getColor(R.color.blue));
+            Log.d("RecipeDetailsAdapter"," Video Url   "+recipe.getStepAt(position-1).getVideoUrl());
         }
     }
 
@@ -61,12 +63,13 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecipeDetailsAdap
 
     @Override
     public int getItemCount() {
-        if(SharedRecipes.sharedRecipes!=null){
+       /* if(SharedRecipes.sharedRecipes!=null){
         Recipe recipe= SharedRecipes.sharedRecipes.get(index);
         return recipe.getSteps().size()+1;}
         else {
             return 0;
-        }
+        }*/
+       return recipe.getSteps().size()+1;
     }
 
 
