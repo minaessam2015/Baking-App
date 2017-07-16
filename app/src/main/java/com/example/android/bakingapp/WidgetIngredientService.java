@@ -16,7 +16,7 @@ public class WidgetIngredientService extends IntentService {
     }
     @Override
     protected void onHandleIntent( Intent intent) {
-        //IngredientRemoteViewsFactory.recipe=intent.getExtras().getParcelable("recipe");
+        IngredientRemoteViewsFactory.recipe=intent.getExtras().getParcelable("recipe");
         AppWidgetManager manager=AppWidgetManager.getInstance(this);
         int[] appWidgetIds = manager.getAppWidgetIds(new ComponentName(this, BakingWidget.class));
         for(int appWidgetId:appWidgetIds)

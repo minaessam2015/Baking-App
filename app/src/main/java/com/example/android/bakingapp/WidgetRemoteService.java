@@ -33,10 +33,6 @@ class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
     String stringResponse;
     Context context;
 
-    private static   final String[] items= { "lorem", "ipsum", "dolor", "sit",
-            "amet", "consectetuer", "adipiscing", "elit", "morbi", "vel", "ligula",
-            "vitae", "arcu", "aliquet", "mollis", "etiam", "vel", "erat", "placerat", "ante",
-            "porttitor", "sodales", "pellentesque", "augue", "purus" };
 
     public WidgetRemoteViewsFactory(Context context){
         this.context=context;
@@ -48,8 +44,8 @@ class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
 
     @Override
     public void onDataSetChanged() {
-        getResponse();
 
+        getResponse();
         try {
             recipes= LoganSquare.parseList(stringResponse,Recipe.class);
         } catch (IOException e) {
@@ -106,6 +102,7 @@ class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
         this.recipes = recipes;
         onDataSetChanged();
     }
+
 
     void getResponse()  {
         URL url=null;

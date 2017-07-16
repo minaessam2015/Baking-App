@@ -63,9 +63,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>  {
 
     @Override
     public int getItemCount() {
-        if(recipes!=null)
+
+            Log.d("MainAdapter","recipes not null "+recipes.size());
         return recipes.size();
-        else return 0;
+
     }
 
      class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{

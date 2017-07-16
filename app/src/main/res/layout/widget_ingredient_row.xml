@@ -3,11 +3,11 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="10dp">
+    android:paddingTop="10dp"
+    android:background="@color/colorAccent">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="1 - "
         android:textSize="18sp"
         android:id="@+id/widget_ingredient_number"
         android:padding="5dp"

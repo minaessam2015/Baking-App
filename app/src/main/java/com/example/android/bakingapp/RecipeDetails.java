@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
 
-public class RecipeDetails extends FragmentActivity implements RecipeDetailsAdapter.ViewClickListener{
+import com.example.android.bakingapp.SharedData.SharedRecipes;
+
+public class RecipeDetails extends FragmentActivity implements RecipeDetailsAdapter.ViewClickListener,StepDetailsFragment.OnImageListener{
     private boolean isTwoPane=false;
     private int recipePosition;
     private StepDetailsFragment stepDetailsFragment;
@@ -40,7 +43,7 @@ public class RecipeDetails extends FragmentActivity implements RecipeDetailsAdap
             //open ingredients
             fragmentBundle.putInt("stepPosition",0);
             stepDetailsFragment.setArguments(fragmentBundle);
-            getSupportFragmentManager().beginTransaction().add(R.id.step_details_fragment,stepDetailsFragment).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.tablet_des_details,stepDetailsFragment).commit();
         }
 
     }
@@ -69,13 +72,15 @@ public class RecipeDetails extends FragmentActivity implements RecipeDetailsAdap
         }else{
             //open step details fragment in tablet
             if(stepPosition>0){
-
+                Log.d("RecipeDetails","step Position  "+stepPosition);
                 Bundle bundle=new Bundle();
                 bundle.putInt("stepPosition", stepPosition-1);
                 bundle.putInt("recipePosition", recipePosition);
                 bundle.putBoolean("isTwoPane", isTwoPane);
-                stepDetailsFragment.setArguments(bundle);
-                getSupportFragmentManager().beginTransaction().replace(R.id.tablet_des_details,stepDetailsFragment).commit();
+                //stepDetailsFragment.setArguments(bundle);
+                StepDetailsFragment fragment=new StepDetailsFragment();
+                fragment.setArguments(bundle);
+                getSupportFragmentManager().beginTransaction().replace(R.id.tablet_des_details,fragment).commit();
 
             }else {
                 Bundle bundle=new Bundle();
@@ -88,5 +93,33 @@ public class RecipeDetails extends FragmentActivity implements RecipeDetailsAdap
 
 
         }
+    }
+
+    @Override
+    public void onImageClickListener(int stepPosition, View view) {
+        StepDetailsFragment newfragment=new StepDetailsFragment();
+        Bundle fragmentBundle = new Bundle();
+        int size= SharedRecipes.sharedRecipes.get(recipePosition).getStepsSize();
+        Log.d("StepDetails",stepPosition+"");
+        if(view.getId()==R.id.next_step) {
+
+            if(stepPosition==size ){
+                return;
+            }
+            // else{stepPosition++;}
+
+        }else if(view.getId()==R.id.prev_step){
+            if(stepPosition<0){
+                return;
+            }
+            //else{stepPosition--;}
+        }
+        Log.d("StepDetails",stepPosition+"   step after edit");
+       // this.stepPosition=stepPosition;
+        fragmentBundle.putInt("stepPosition", stepPosition);
+        fragmentBundle.putInt("recipePosition", recipePosition);
+        fragmentBundle.putBoolean("isTwoPane", false);
+        newfragment.setArguments(fragmentBundle);
+        getSupportFragmentManager().beginTransaction().replace(R.id.step_details_fragment,newfragment).commit();
     }
 }

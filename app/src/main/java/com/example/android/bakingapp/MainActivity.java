@@ -60,7 +60,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getIdlingResource();
         if(findViewById(R.id.tablet_main)!=null){
             isTwoPane=true;
-            gridLayoutManager=new GridLayoutManager(this,GridLayoutManager.DEFAULT_SPAN_COUNT);
+            Log.d("MainActivity","Is Tablet");
+            gridLayoutManager=new GridLayoutManager(this,2);
             recyclerView.setLayoutManager(gridLayoutManager);
         }else {
 
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }else {
             Log.d("MainActivity"," layoutState is  NULL ");
         }
-        recyclerView.setAdapter(adapter);
+
 
 
 
@@ -103,15 +104,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 public void onResponse(String response) {
                     responseString = response;
                     Log.d("onResponse", response);
-               /* try {
-                    for(int i=0;i<response.length();i++){
-                        JSONObject jsonRecipe=response.getJSONObject(i);
-                        String recipeName=jsonRecipe.getString("name");
-                        //extract the
-                    }
-                }catch (JSONException e){
-                    e.printStackTrace();
-                }*/
                     restartLoader();
                 }
             }, new Response.ErrorListener() {
@@ -124,11 +116,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }else {
             Log.d("MainActivity"," responseString is NOT NULL \n ");
         }
+
         getSupportLoaderManager().initLoader(0,null,this);
         //check to see if the loader exist and restart if so
         if(getSupportLoaderManager().getLoader(0)!=null){
             getSupportLoaderManager().restartLoader(0,null,this);
         }
+
     }
 
     @Override
@@ -195,7 +189,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Void> loader, Void data) {
        adapter.setRecipes(recipes);
+        if(responseString!=null){
+        Log.d("MainActivity","From Load Finish  recipes size  "+recipes.size());
+        Log.d("MainActivity","From Load Finish\n"+responseString);
         idlingResource.setIdleState(true);
+        recyclerView.setAdapter(adapter);}
+
     }
 
     @Override

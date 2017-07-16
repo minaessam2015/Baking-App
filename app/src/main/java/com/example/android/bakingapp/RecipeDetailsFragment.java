@@ -52,6 +52,8 @@ public class RecipeDetailsFragment extends Fragment  {
         super.onAttach(context);
         try {
             listener=(RecipeDetailsAdapter.ViewClickListener) context;
+            if(listener!=null)Log.d("RecipeDetailsFragment","Listener NOT NULL");
+            else Log.d("RecipeDetailsFragment","Listener  NULL");
         }catch (ClassCastException e){
             e.printStackTrace();
         }
