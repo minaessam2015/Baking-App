@@ -3,6 +3,10 @@ package com.example.android.bakingapp;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -18,6 +22,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bluelinelabs.logansquare.LoganSquare;
+import com.example.android.bakingapp.IdilingResource.MyIdlingResource;
 import com.example.android.bakingapp.SharedData.SharedRecipes;
 
 import java.io.IOException;
@@ -35,6 +40,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     String responseString;
     List<Recipe> recipes=new ArrayList<>();
     Context context;
+    LinearLayoutManager linearLayoutManager;
+    GridLayoutManager gridLayoutManager;
+    Parcelable layoutState;
+    int recipePosition;
+    static final String recyclerState="state";
+    @Nullable private MyIdlingResource idlingResource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,24 +57,52 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         adapter=new MainAdapter(this);
         adapter.setListener(this);
         context=this;
+        getIdlingResource();
         if(findViewById(R.id.tablet_main)!=null){
             isTwoPane=true;
-            recyclerView.setLayoutManager(new GridLayoutManager(this,GridLayoutManager.DEFAULT_SPAN_COUNT));
+            gridLayoutManager=new GridLayoutManager(this,GridLayoutManager.DEFAULT_SPAN_COUNT);
+            recyclerView.setLayoutManager(gridLayoutManager);
         }else {
 
             isTwoPane=false;
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            linearLayoutManager=new LinearLayoutManager(this);
+            recyclerView.setLayoutManager(linearLayoutManager);
+        }
+        if(savedInstanceState!=null){
+            Log.d("MainActivity"," layoutState is NOT NULL ");
+            layoutState=savedInstanceState.getParcelable(recyclerState);
+            if(isTwoPane){
+                gridLayoutManager.onRestoreInstanceState(layoutState);
+            }else {
+                linearLayoutManager.onRestoreInstanceState(layoutState);
+            }
+            responseString=savedInstanceState.getString("responseString");
+        }else {
+            Log.d("MainActivity"," layoutState is  NULL ");
         }
         recyclerView.setAdapter(adapter);
+
+
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         //volley
         //getApplicationContext to ensure that this request queue stays alive
         //during application life cycle , not tied to the activity lifecycle
-        RequestQueue queue= Volley.newRequestQueue(getApplicationContext());
-        StringRequest request=new StringRequest(url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                responseString=response;
-                Log.d("onResponse",response);
+
+        if(responseString==null) {
+            Log.d("MainActivity"," from volly responseString is  NULL \n");
+            idlingResource.setIdleState(false);
+            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+            StringRequest request = new StringRequest(url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    responseString = response;
+                    Log.d("onResponse", response);
                /* try {
                     for(int i=0;i<response.length();i++){
                         JSONObject jsonRecipe=response.getJSONObject(i);
@@ -73,21 +112,51 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }catch (JSONException e){
                     e.printStackTrace();
                 }*/
-               restartLoader();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                    restartLoader();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
 
-            }
-        });
-        queue.add(request);
+                }
+            });
+            queue.add(request);
+        }else {
+            Log.d("MainActivity"," responseString is NOT NULL \n ");
+        }
         getSupportLoaderManager().initLoader(0,null,this);
         //check to see if the loader exist and restart if so
         if(getSupportLoaderManager().getLoader(0)!=null){
-          //  getSupportLoaderManager().restartLoader(0,null,this);
+            getSupportLoaderManager().restartLoader(0,null,this);
         }
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(isTwoPane){
+            layoutState=gridLayoutManager.onSaveInstanceState();
+        }else {
+            layoutState=linearLayoutManager.onSaveInstanceState();
+        }
+        outState.putParcelable(recyclerState,layoutState);
+        outState.putString("responseString",responseString);
+        //outState.putInt("position",linearLayoutManager.findFirstVisibleItemPosition());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState!=null){
+
+            layoutState=savedInstanceState.getParcelable(recyclerState);
+            if(layoutState==null)Log.d("MainActivity","from onRestoreInstanceState layoutState is NULL ");
+            responseString=savedInstanceState.getString("responseString");
+        }
+
+    }
+
+
 
     void restartLoader(){
         getSupportLoaderManager().restartLoader(0,null,this);
@@ -106,23 +175,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             @Override
             public Void loadInBackground() {
-                if (responseString != null ) {
-                    Log.d("responseString",responseString);
-                    try {
-                        recipes = LoganSquare.parseList(responseString, Recipe.class);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    SharedRecipes.sharedRecipes=recipes;
 
-                }
+                    if (responseString != null) {
+                        Log.d("responseString", responseString);
+                        try {
+                            recipes = LoganSquare.parseList(responseString, Recipe.class);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        SharedRecipes.sharedRecipes = recipes;
+
+                    }
+
                 return null;
             }
         };
+
     }
     @Override
     public void onLoadFinished(Loader<Void> loader, Void data) {
        adapter.setRecipes(recipes);
+        idlingResource.setIdleState(true);
     }
 
     @Override
@@ -137,5 +210,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         intent.putExtra("recipePosition",position);
         intent.putExtra("recipe",recipes.get(position));
         startActivity(intent);
+    }
+    @VisibleForTesting
+    @NonNull
+    public MyIdlingResource getIdlingResource(){
+        if(idlingResource==null) {
+            idlingResource= new MyIdlingResource();
+            return idlingResource;
+        }
+        else return idlingResource;
     }
 }

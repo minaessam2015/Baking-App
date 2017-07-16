@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import butterknife.ButterKnife;
  */
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>  {
+
 
     interface CardClickListener{
          void onCardClickListener(int position);
@@ -50,11 +52,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>  {
     public void onBindViewHolder(ViewHolder holder, int position) {
         Recipe recipe=recipes.get(position);
         String imageUrl=recipe.getImageUrl();
-        if(!imageUrl.equals("")){
-            //download the image
-        }else {
-            holder.imageView.setImageResource(R.drawable.brownie);
-        }
+        if(imageUrl.equals("")) imageUrl="anyfakestring";
+        Picasso.with(context).load(imageUrl).error(R.drawable.brownie).into(holder.imageView);
         holder.textView.setText(recipe.getName());
     }
 
@@ -64,7 +63,9 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder>  {
 
     @Override
     public int getItemCount() {
+        if(recipes!=null)
         return recipes.size();
+        else return 0;
     }
 
      class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{

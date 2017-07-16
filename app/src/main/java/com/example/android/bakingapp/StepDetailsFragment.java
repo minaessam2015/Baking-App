@@ -27,6 +27,7 @@ import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,6 +51,7 @@ public class StepDetailsFragment extends Fragment {
     ImageView nextStepImage;
     @BindView(R.id.prev_step)
     ImageView prevStep;
+    ImageView imageView;
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.step_details_fragment,container,false);
@@ -77,7 +79,14 @@ public class StepDetailsFragment extends Fragment {
             stepDesc=(TextView)view.findViewById(R.id.step_description);
             nextStepImage=(ImageView)view.findViewById(R.id.next_step);
             prevStep=(ImageView)view.findViewById(R.id.prev_step);
-
+            imageView=(ImageView) view.findViewById(R.id.imageView);
+            if(SharedRecipes.sharedRecipes.get(recipePosition).getStepAt(stepPosition).getImageUrl().equals("")){
+                imageView.setVisibility(View.GONE);
+            }else {
+                Picasso.with(context).load(SharedRecipes.sharedRecipes.get(recipePosition).getStepAt(stepPosition).getImageUrl()).
+                        into(imageView);
+                imageView.setVisibility(View.VISIBLE);
+            }
             stepDesc.setText(SharedRecipes.sharedRecipes.get(recipePosition).getStepAt(stepPosition).getDescription());
             if(isTwoPane){
                 //tablet
@@ -143,8 +152,8 @@ public class StepDetailsFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
         releasePlayer();
     }
     void releasePlayer(){

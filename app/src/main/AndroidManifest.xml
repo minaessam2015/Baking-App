@@ -33,6 +33,9 @@
         </receiver>
         <service android:name=".WidgetRemoteService"
             android:permission="android.permission.BIND_REMOTEVIEWS" ></service>
+        <service android:name=".WidgetIngredientRemoteService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"></service>
+        <service android:name=".WidgetIngredientService"></service>
     </application>
 
 </manifest>
